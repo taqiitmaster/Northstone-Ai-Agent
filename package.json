@@ -1,0 +1,7 @@
+{
+  "name": "northstone-demo",
+  "version": "1.0.0",
+  "dependencies": {
+    "@neondatabase/serverless": "latest"
+  }
+}
