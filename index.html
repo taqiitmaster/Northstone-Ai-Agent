@@ -334,6 +334,18 @@
           <div class="lrow"><div class="name">T. Boone</div><div><span class="pill home">Home</span></div><div class="snippet">"Just comparing options for now"</div><div class="answered">Answered · 1 hr ago</div><div><span class="heat cold">Cold</span></div></div>
           <div class="lrow"><div class="name">A. Farrow</div><div><span class="pill health">Health</span></div><div class="snippet">"What's covered under the family plan?"</div><div class="answered">Answered · 2 hr ago</div><div><span class="heat warm">Warm</span></div></div>
         </div>
+
+        <div style="margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px;">
+          <div>
+            <h2 class="serif" style="font-size:19px; margin:0 0 4px; font-weight:600;">Your follow-up leads</h2>
+            <p style="font-size:12.5px; color:var(--muted); margin:0; max-width:480px;">Add a real client. Choose how many follow-ups they get. Watch the AI write and track the whole thread.</p>
+          </div>
+          <button class="btn primary" onclick="openAddLead()">+ Add lead</button>
+        </div>
+        <div class="table-wrap" id="addedLeadsWrap">
+          <div class="lrow head"><div>Name</div><div>Line</div><div>Follow-ups</div><div>Status</div><div></div></div>
+          <div class="lrow" id="addedLeadsEmpty"><div style="grid-column:1/-1; color:var(--muted); font-size:13px; padding:6px 0;">No leads added yet — click "+ Add lead" above to try it.</div></div>
+        </div>
       </div>
 
       <!-- PRODUCT LINES -->
@@ -504,6 +516,127 @@
       console.error(err);
     }
   }
+
+  // ---------- Add Lead + follow-up threads ----------
+  const LEADS_ENDPOINT = "/api/leads";
+
+  function openAddLead(){
+    document.getElementById('leadName').value = '';
+    document.getElementById('leadEmail').value = '';
+    document.getElementById('leadDays').value = '7';
+    document.getElementById('addLeadNote').textContent = 'First message is written by AI on save';
+    document.getElementById('addLeadOverlay').style.opacity = 1;
+    document.getElementById('addLeadOverlay').style.pointerEvents = 'auto';
+  }
+  function closeAddLead(){
+    document.getElementById('addLeadOverlay').style.opacity = 0;
+    document.getElementById('addLeadOverlay').style.pointerEvents = 'none';
+  }
+
+  async function submitAddLead(){
+    const name = document.getElementById('leadName').value.trim();
+    if(!name){ document.getElementById('addLeadNote').textContent = 'Add a name first'; return; }
+    const email = document.getElementById('leadEmail').value.trim();
+    const line = document.getElementById('leadLine').value;
+    const days = parseInt(document.getElementById('leadDays').value || '7', 10);
+    const followupCount = parseInt(document.getElementById('leadFollowups').value, 10);
+    const note = document.getElementById('addLeadNote');
+    note.innerHTML = '<span class="spinner"></span> Writing the first message…';
+    try {
+      const res = await fetch(LEADS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action:'create', ownerLeadId: leadId, name, email, line, days, followupCount, sendReal: !!email })
+      });
+      const data = await res.json();
+      if(!res.ok || data.error){ note.textContent = '⚠ Could not save — try again'; return; }
+      closeAddLead();
+      loadAddedLeads();
+    } catch(err){
+      note.textContent = '⚠ Could not reach the server';
+      console.error(err);
+    }
+  }
+
+  async function loadAddedLeads(){
+    try {
+      const res = await fetch(`${LEADS_ENDPOINT}?action=list&ownerLeadId=${encodeURIComponent(leadId)}`);
+      const data = await res.json();
+      const wrap = document.getElementById('addedLeadsWrap');
+      const rows = (data.leads || []);
+      if(rows.length === 0){
+        wrap.innerHTML = '<div class="lrow head"><div>Name</div><div>Line</div><div>Follow-ups</div><div>Status</div><div></div></div>'
+          + '<div class="lrow"><div style="grid-column:1/-1; color:var(--muted); font-size:13px; padding:6px 0;">No leads added yet — click "+ Add lead" above to try it.</div></div>';
+        return;
+      }
+      wrap.innerHTML = '<div class="lrow head"><div>Name</div><div>Line</div><div>Follow-ups</div><div>Status</div><div></div></div>'
+        + rows.map(r => `
+          <div class="lrow">
+            <div><div class="name">${r.name}</div>${r.email ? `<div class="snippet">${r.email}</div>` : ''}</div>
+            <div><span class="pill ${r.line.toLowerCase()}">${r.line}</span></div>
+            <div class="snippet">${r.followups_sent} of ${r.followup_count} sent</div>
+            <div class="answered">${r.last_status || 'Draft ready'}</div>
+            <div class="row-actions"><button class="btn" onclick="openThread(${r.id})">View chat</button></div>
+          </div>`).join('');
+    } catch(err){ console.error(err); }
+  }
+
+  let currentThreadLeadId = null;
+  async function openThread(leadRecordId){
+    currentThreadLeadId = leadRecordId;
+    const overlay = document.getElementById('threadOverlay');
+    overlay.style.opacity = 1; overlay.style.pointerEvents = 'auto';
+    document.getElementById('threadBody').innerHTML = '<div style="font-size:13px; color:var(--muted);">Loading…</div>';
+    await refreshThread();
+  }
+  function closeThread(){
+    document.getElementById('threadOverlay').style.opacity = 0;
+    document.getElementById('threadOverlay').style.pointerEvents = 'none';
+  }
+
+  async function refreshThread(){
+    const res = await fetch(`${LEADS_ENDPOINT}?action=thread&leadRecordId=${currentThreadLeadId}`);
+    const data = await res.json();
+    const lead = data.lead;
+    document.getElementById('threadClient').textContent = lead.name + ' — follow-up thread';
+    document.getElementById('threadMeta').textContent = `${lead.line} · ${lead.followups_sent} of ${lead.followup_count} follow-ups sent`;
+    document.getElementById('threadBody').innerHTML = (data.messages || []).map(m => `
+      <div style="border:1px solid var(--line); border-radius:10px; padding:12px 14px;">
+        <div style="font-size:10.5px; color:var(--slate); font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;">
+          Follow-up ${m.sequence_no} · ${m.sent ? '✅ Sent' : '— Draft (not sent)'}
+        </div>
+        <div style="font-size:13px; line-height:1.5;">${m.text}</div>
+        ${m.sent_note ? `<div style="font-size:11px; color:var(--muted); margin-top:6px;">${m.sent_note}</div>` : ''}
+      </div>`).join('');
+    const btn = document.getElementById('threadNextBtn');
+    if(lead.followups_sent >= lead.followup_count){
+      btn.textContent = 'All follow-ups sent'; btn.disabled = true; btn.style.opacity = .5;
+    } else {
+      btn.textContent = `Send follow-up ${lead.followups_sent + 1} of ${lead.followup_count}`; btn.disabled = false; btn.style.opacity = 1;
+    }
+    document.getElementById('threadNote').textContent = '';
+  }
+
+  async function sendNextFollowup(){
+    const note = document.getElementById('threadNote');
+    note.innerHTML = '<span class="spinner"></span> Writing the next message…';
+    try {
+      const res = await fetch(LEADS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action:'followup', leadRecordId: currentThreadLeadId })
+      });
+      const data = await res.json();
+      if(!res.ok || data.error){ note.textContent = '⚠ Could not generate — try again'; return; }
+      await refreshThread();
+      loadAddedLeads();
+    } catch(err){
+      note.textContent = '⚠ Could not reach the server';
+      console.error(err);
+    }
+  }
+
+  loadAddedLeads();
 </script>
 
 </body>
