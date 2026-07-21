@@ -127,7 +127,7 @@ module.exports = async (req, res) => {
       const safeName = String(name || 'Client').slice(0, 120);
       const safeLine = String(line || 'Auto').slice(0, 40);
       const safeDays = Math.max(0, parseInt(days, 10) || 7);
-      const safeCount = Math.min(5, Math.max(1, parseInt(followupCount, 10) || 3));
+      const safeCount = Math.max(1, parseInt(followupCount, 10) || 3);
 
       const inserted = await sql`
         INSERT INTO demo_leads_added (owner_lead_id, name, email, line, days, followup_count, followups_sent)
