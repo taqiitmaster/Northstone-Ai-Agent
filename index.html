@@ -420,6 +420,55 @@
     </div>
   </div>
 
+  <!-- ADD LEAD MODAL -->
+  <div id="addLeadOverlay" style="position:fixed; inset:0; background:rgba(13,22,38,.55); z-index:95; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .2s ease;">
+    <div class="modal" style="width:440px;">
+      <div class="modal-head">
+        <div><h3>Add a lead</h3><div class="sub">Real client, real follow-up thread</div></div>
+        <div class="x" onclick="closeAddLead()">✕</div>
+      </div>
+      <div class="modal-body">
+        <label>Name</label>
+        <input id="leadName" type="text" placeholder="e.g. Priya Shah" style="width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; margin-bottom:14px; font-family:'Inter',sans-serif;">
+        <label>Email (optional — for a real demo send)</label>
+        <input id="leadEmail" type="email" placeholder="their@email.com" style="width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; margin-bottom:14px; font-family:'Inter',sans-serif;">
+        <div style="display:flex; gap:12px; margin-bottom:14px;">
+          <div style="flex:1;">
+            <label>Policy line</label>
+            <select id="leadLine" style="width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; font-family:'Inter',sans-serif;">
+              <option value="Health">Health</option><option value="Auto">Auto</option><option value="Home">Home</option><option value="Travel">Travel</option><option value="Business">Business</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label>Renews in (days)</label>
+            <input id="leadDays" type="number" value="7" min="0" style="width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; font-family:'Inter',sans-serif;">
+          </div>
+        </div>
+        <label>Number of follow-ups (your choice — no limit)</label>
+        <input id="leadFollowups" type="number" value="3" min="1" style="width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; font-size:13.5px; margin-bottom:6px; font-family:'Inter',sans-serif;">
+      </div>
+      <div class="modal-foot">
+        <div class="ai-note" id="addLeadNote" style="font-size:11px;">First message is written by AI on save</div>
+        <button class="btn primary" onclick="submitAddLead()">Save &amp; generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREAD VIEWER MODAL -->
+  <div id="threadOverlay" style="position:fixed; inset:0; background:rgba(13,22,38,.55); z-index:95; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .2s ease;">
+    <div class="modal" style="width:480px;">
+      <div class="modal-head">
+        <div><h3 id="threadClient">Thread</h3><div class="sub" id="threadMeta"></div></div>
+        <div class="x" onclick="closeThread()">✕</div>
+      </div>
+      <div class="modal-body" id="threadBody" style="display:flex; flex-direction:column; gap:12px;"></div>
+      <div class="modal-foot">
+        <div class="ai-note" id="threadNote" style="font-size:11px;"></div>
+        <button class="btn primary" id="threadNextBtn" onclick="sendNextFollowup()">Send next follow-up</button>
+      </div>
+    </div>
+  </div>
+
 <script>
   const CHAT_ENDPOINT = "/api/draft";
   const params = new URLSearchParams(window.location.search);
