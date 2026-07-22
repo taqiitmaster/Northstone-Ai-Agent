@@ -22,9 +22,11 @@ async function ensureTables() {
       days INT NOT NULL DEFAULT 7,
       followup_count INT NOT NULL DEFAULT 3,
       followups_sent INT NOT NULL DEFAULT 0,
+      responded BOOLEAN NOT NULL DEFAULT false,
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `;
+  await sql`ALTER TABLE demo_leads_added ADD COLUMN IF NOT EXISTS responded BOOLEAN NOT NULL DEFAULT false`;
   await sql`
     CREATE TABLE IF NOT EXISTS demo_leads_messages (
       id SERIAL PRIMARY KEY,
@@ -36,6 +38,12 @@ async function ensureTables() {
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `;
+}
+
+function statusFor(lead) {
+  if (lead.responded) return 'Responded';
+  if (lead.followups_sent >= lead.followup_count) return 'No response — flagged for a call';
+  return `${lead.followups_sent} of ${lead.followup_count} sent`;
 }
 
 async function generateMessage(name, line, days, sequenceNo) {
@@ -107,7 +115,8 @@ module.exports = async (req, res) => {
       const rows = await sql`
         SELECT * FROM demo_leads_added WHERE owner_lead_id = ${ownerLeadId} ORDER BY created_at DESC
       `;
-      return res.status(200).json({ leads: rows });
+      const withStatus = rows.map((r) => ({ ...r, last_status: statusFor(r) }));
+      return res.status(200).json({ leads: withStatus });
     }
 
     // ---------- THREAD ----------
@@ -174,6 +183,13 @@ module.exports = async (req, res) => {
       `;
       await sql`UPDATE demo_leads_added SET followups_sent = ${nextSeq} WHERE id = ${leadRecordId}`;
 
+      return res.status(200).json({ ok: true });
+    }
+
+    // ---------- MARK RESPONDED ----------
+    if (req.method === 'POST' && req.body?.action === 'mark-responded') {
+      const leadRecordId = parseInt(req.body.leadRecordId, 10);
+      await sql`UPDATE demo_leads_added SET responded = true WHERE id = ${leadRecordId}`;
       return res.status(200).json({ ok: true });
     }
 
