@@ -237,6 +237,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         Product Lines
       </div>
+      <div class="navitem" data-view="coi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4M21 12c0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8 8 3.6 8 8z"/></svg>
+        Certificates
+      </div>
       <div class="navitem" data-view="insights">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 20V10M10 20V4M17 20v-7"/></svg>
         Insights
@@ -318,13 +322,25 @@
           <div class="rrow head"><div>Client</div><div>Line</div><div>Status</div><div>Draft message</div><div></div></div>
           <!-- rows injected by JS -->
         </div>
+
+        <div style="margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px;">
+          <div>
+            <h2 class="serif" style="font-size:19px; margin:0 0 4px; font-weight:600;">Your own renewal clients</h2>
+            <p style="font-size:12.5px; color:var(--muted); margin:0; max-width:560px;">In production, this list fills itself from your AMS. For this demo, add a real existing client by hand — someone who already has a policy — and watch the follow-up sequence run for real.</p>
+          </div>
+          <button class="btn primary" onclick="openAddLead()">+ Add client</button>
+        </div>
+        <div class="table-wrap" id="addedLeadsWrap">
+          <div class="lrow head"><div>Client</div><div>Line</div><div>Follow-ups</div><div>Status</div><div></div></div>
+          <div class="lrow" id="addedLeadsEmpty"><div style="grid-column:1/-1; color:var(--muted); font-size:13px; padding:6px 0;">No clients added yet — click "+ Add client" above to try it.</div></div>
+        </div>
       </div>
 
       <!-- LEADS -->
       <div class="view" id="view-leads">
         <div class="page-head">
           <h1>Lead Inbox</h1>
-          <p>Every enquiry gets answered and qualified the moment it lands — across every product line, every hour of the day.</p>
+          <p>New enquiries — people who don't have a policy yet. Every one gets answered and qualified the moment it lands.</p>
         </div>
         <div class="table-wrap">
           <div class="lrow head"><div>Name</div><div>Line</div><div>Enquiry</div><div>AI response</div><div>Heat</div></div>
@@ -333,18 +349,6 @@
           <div class="lrow"><div class="name">L. Marsh</div><div><span class="pill business">Business</span></div><div class="snippet">"Looking for liability cover for a small studio"</div><div class="answered">Answered · 34 min ago</div><div><span class="heat hot">Hot</span></div></div>
           <div class="lrow"><div class="name">T. Boone</div><div><span class="pill home">Home</span></div><div class="snippet">"Just comparing options for now"</div><div class="answered">Answered · 1 hr ago</div><div><span class="heat cold">Cold</span></div></div>
           <div class="lrow"><div class="name">A. Farrow</div><div><span class="pill health">Health</span></div><div class="snippet">"What's covered under the family plan?"</div><div class="answered">Answered · 2 hr ago</div><div><span class="heat warm">Warm</span></div></div>
-        </div>
-
-        <div style="margin-top:40px; display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:16px;">
-          <div>
-            <h2 class="serif" style="font-size:19px; margin:0 0 4px; font-weight:600;">Your follow-up leads</h2>
-            <p style="font-size:12.5px; color:var(--muted); margin:0; max-width:480px;">Add a real client. Choose how many follow-ups they get. Watch the AI write and track the whole thread.</p>
-          </div>
-          <button class="btn primary" onclick="openAddLead()">+ Add lead</button>
-        </div>
-        <div class="table-wrap" id="addedLeadsWrap">
-          <div class="lrow head"><div>Name</div><div>Line</div><div>Follow-ups</div><div>Status</div><div></div></div>
-          <div class="lrow" id="addedLeadsEmpty"><div style="grid-column:1/-1; color:var(--muted); font-size:13px; padding:6px 0;">No leads added yet — click "+ Add lead" above to try it.</div></div>
         </div>
       </div>
 
@@ -361,6 +365,29 @@
           <div class="plrow"><div class="pname">Home</div><div class="num">29</div><div class="num">188</div><div class="num">$241,600</div></div>
           <div class="plrow"><div class="pname">Travel</div><div class="num">17</div><div class="num">96</div><div class="num">$54,200</div></div>
           <div class="plrow"><div class="pname">Business</div><div class="num">12</div><div class="num">73</div><div class="num">$198,300</div></div>
+        </div>
+      </div>
+
+      <!-- COI -->
+      <div class="view" id="view-coi">
+        <div class="page-head">
+          <h1>Certificates of Insurance</h1>
+          <p>Most COI requests are routine — verify coverage, generate the certificate, send it. The AI handles it end to end and only pulls you in if something doesn't match.</p>
+        </div>
+
+        <div class="table-wrap" style="padding:22px 24px; margin-bottom:20px;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate); font-weight:700; margin-bottom:10px;">Incoming request (by email)</div>
+          <div style="font-size:13.5px; line-height:1.6; background:#FAF8F2; border:1px solid var(--line); border-radius:10px; padding:14px 16px;">
+            "Hi, we need a Certificate of Insurance for <b>R. Chen</b> showing General Liability coverage — our landlord needs it on file by Friday. Can you send it over? Thanks."
+          </div>
+        </div>
+
+        <div class="table-wrap" style="padding:22px 24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate); font-weight:700;">AI-generated response</div>
+            <button class="btn primary" onclick="generateCOI()">Process with AI</button>
+          </div>
+          <div id="coiOutput" style="font-size:13.5px; line-height:1.6; color:var(--muted);">Click "Process with AI" to watch it verify coverage and draft the certificate — live.</div>
         </div>
       </div>
 
@@ -464,7 +491,10 @@
       <div class="modal-body" id="threadBody" style="display:flex; flex-direction:column; gap:12px;"></div>
       <div class="modal-foot">
         <div class="ai-note" id="threadNote" style="font-size:11px;"></div>
-        <button class="btn primary" id="threadNextBtn" onclick="sendNextFollowup()">Send next follow-up</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" id="threadRespondedBtn" onclick="markResponded()">Mark as responded</button>
+          <button class="btn primary" id="threadNextBtn" onclick="sendNextFollowup()">Send next follow-up</button>
+        </div>
       </div>
     </div>
   </div>
@@ -649,7 +679,15 @@
     const lead = data.lead;
     document.getElementById('threadClient').textContent = lead.name + ' — follow-up thread';
     document.getElementById('threadMeta').textContent = `${lead.line} · ${lead.followups_sent} of ${lead.followup_count} follow-ups sent`;
-    document.getElementById('threadBody').innerHTML = (data.messages || []).map(m => `
+
+    let banner = '';
+    if(lead.responded){
+      banner = `<div style="background:var(--teal-soft); color:var(--teal); border-radius:10px; padding:11px 14px; font-size:12.5px; font-weight:600;">✅ This client responded — no further follow-ups needed.</div>`;
+    } else if(lead.followups_sent >= lead.followup_count){
+      banner = `<div style="background:var(--red-soft); color:var(--red); border-radius:10px; padding:11px 14px; font-size:12.5px; font-weight:600;">🚩 No response after ${lead.followup_count} follow-up${lead.followup_count===1?'':'s'} — flagged for a producer to call directly.</div>`;
+    }
+
+    document.getElementById('threadBody').innerHTML = banner + (data.messages || []).map(m => `
       <div style="border:1px solid var(--line); border-radius:10px; padding:12px 14px;">
         <div style="font-size:10.5px; color:var(--slate); font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em;">
           Follow-up ${m.sequence_no} · ${m.sent ? '✅ Sent' : '— Draft (not sent)'}
@@ -657,13 +695,37 @@
         <div style="font-size:13px; line-height:1.5;">${m.text}</div>
         ${m.sent_note ? `<div style="font-size:11px; color:var(--muted); margin-top:6px;">${m.sent_note}</div>` : ''}
       </div>`).join('');
+
     const btn = document.getElementById('threadNextBtn');
-    if(lead.followups_sent >= lead.followup_count){
+    const respondedBtn = document.getElementById('threadRespondedBtn');
+    if(lead.responded){
+      btn.textContent = 'Responded — no follow-up needed'; btn.disabled = true; btn.style.opacity = .5;
+      respondedBtn.disabled = true; respondedBtn.style.opacity = .5;
+    } else if(lead.followups_sent >= lead.followup_count){
       btn.textContent = 'All follow-ups sent'; btn.disabled = true; btn.style.opacity = .5;
+      respondedBtn.disabled = false; respondedBtn.style.opacity = 1;
     } else {
       btn.textContent = `Send follow-up ${lead.followups_sent + 1} of ${lead.followup_count}`; btn.disabled = false; btn.style.opacity = 1;
+      respondedBtn.disabled = false; respondedBtn.style.opacity = 1;
     }
     document.getElementById('threadNote').textContent = '';
+  }
+
+  async function markResponded(){
+    const note = document.getElementById('threadNote');
+    note.innerHTML = '<span class="spinner"></span> Updating…';
+    try {
+      await fetch(LEADS_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action:'mark-responded', leadRecordId: currentThreadLeadId })
+      });
+      await refreshThread();
+      loadAddedLeads();
+    } catch(err){
+      note.textContent = '⚠ Could not reach the server';
+      console.error(err);
+    }
   }
 
   async function sendNextFollowup(){
@@ -681,6 +743,23 @@
       loadAddedLeads();
     } catch(err){
       note.textContent = '⚠ Could not reach the server';
+      console.error(err);
+    }
+  }
+
+  async function generateCOI(){
+    const out = document.getElementById('coiOutput');
+    out.innerHTML = '<span class="spinner"></span> Verifying coverage and drafting the certificate…';
+    try {
+      const res = await fetch('/api/coi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leadId })
+      });
+      const data = await res.json();
+      out.innerHTML = (data.response || 'Something went wrong — try again.').replace(/\n/g, '<br>');
+    } catch(err){
+      out.textContent = '⚠ Could not reach the AI just now — try again in a moment.';
       console.error(err);
     }
   }
