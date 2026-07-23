@@ -237,10 +237,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         Product Lines
       </div>
-      <div class="navitem" data-view="coi">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4M21 12c0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8 8 3.6 8 8z"/></svg>
-        Certificates
-      </div>
       <div class="navitem" data-view="insights">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 20V10M10 20V4M17 20v-7"/></svg>
         Insights
@@ -365,29 +361,6 @@
           <div class="plrow"><div class="pname">Home</div><div class="num">29</div><div class="num">188</div><div class="num">$241,600</div></div>
           <div class="plrow"><div class="pname">Travel</div><div class="num">17</div><div class="num">96</div><div class="num">$54,200</div></div>
           <div class="plrow"><div class="pname">Business</div><div class="num">12</div><div class="num">73</div><div class="num">$198,300</div></div>
-        </div>
-      </div>
-
-      <!-- COI -->
-      <div class="view" id="view-coi">
-        <div class="page-head">
-          <h1>Certificates of Insurance</h1>
-          <p>Most COI requests are routine — verify coverage, generate the certificate, send it. The AI handles it end to end and only pulls you in if something doesn't match.</p>
-        </div>
-
-        <div class="table-wrap" style="padding:22px 24px; margin-bottom:20px;">
-          <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate); font-weight:700; margin-bottom:10px;">Incoming request (by email)</div>
-          <div style="font-size:13.5px; line-height:1.6; background:#FAF8F2; border:1px solid var(--line); border-radius:10px; padding:14px 16px;">
-            "Hi, we need a Certificate of Insurance for <b>R. Chen</b> showing General Liability coverage — our landlord needs it on file by Friday. Can you send it over? Thanks."
-          </div>
-        </div>
-
-        <div class="table-wrap" style="padding:22px 24px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--slate); font-weight:700;">AI-generated response</div>
-            <button class="btn primary" onclick="generateCOI()">Process with AI</button>
-          </div>
-          <div id="coiOutput" style="font-size:13.5px; line-height:1.6; color:var(--muted);">Click "Process with AI" to watch it verify coverage and draft the certificate — live.</div>
         </div>
       </div>
 
@@ -743,23 +716,6 @@
       loadAddedLeads();
     } catch(err){
       note.textContent = '⚠ Could not reach the server';
-      console.error(err);
-    }
-  }
-
-  async function generateCOI(){
-    const out = document.getElementById('coiOutput');
-    out.innerHTML = '<span class="spinner"></span> Verifying coverage and drafting the certificate…';
-    try {
-      const res = await fetch('/api/coi', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId })
-      });
-      const data = await res.json();
-      out.innerHTML = (data.response || 'Something went wrong — try again.').replace(/\n/g, '<br>');
-    } catch(err){
-      out.textContent = '⚠ Could not reach the AI just now — try again in a moment.';
       console.error(err);
     }
   }
